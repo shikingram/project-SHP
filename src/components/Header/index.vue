@@ -11,7 +11,7 @@
             <router-link to="/login">登录</router-link>
             <router-link to="/register" class="register">免费注册</router-link>
           </p>
-        </div> 
+        </div>
         <div class="typeList">
           <a href="###">我的订单</a>
           <a href="###">我的购物车</a>
@@ -39,7 +39,11 @@
             class="input-error input-xxlarge"
             v-model="keyword"
           />
-          <button class="sui-btn btn-xlarge btn-danger" type="button" @click="goSearch">
+          <button
+            class="sui-btn btn-xlarge btn-danger"
+            type="button"
+            @click="goSearch"
+          >
             搜索
           </button>
         </form>
@@ -50,22 +54,30 @@
 
 <script>
 export default {
-  name: "Header", 
+  name: "Header",
   data() {
     return {
-        keyword:'',
-    }
+      keyword: "",
+    };
+  },
+  mounted() {
+    this.$bus.$on("clearKeyword", () => {
+      this.keyword = "";
+    });
   },
   methods: {
     goSearch() {
-        // 跳转search路由
-        let location = {name:"search",params:{keyword:this.keyword || undefind}}
-        if (this.$route.query) {
-            location.query = this.$route.query
-        } 
-        this.$router.push(location)
-    }
-  }
+      // 跳转search路由
+      let location = {
+        name: "search",
+        params: { keyword: this.keyword || undefind },
+      };
+      if (this.$route.query) {
+        location.query = this.$route.query;
+      }
+      this.$router.push(location);
+    },
+  },
 };
 </script>
 

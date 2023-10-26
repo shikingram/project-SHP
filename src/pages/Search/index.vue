@@ -11,15 +11,14 @@
             </li>
           </ul>
           <ul class="fl sui-tag">
-            <li class="with-x">手机</li>
-            <li class="with-x">iphone<i>×</i></li>
-            <li class="with-x">华为<i>×</i></li>
-            <li class="with-x">OPPO<i>×</i></li>
+            <li class="with-x" v-if="searchParams.categoryName">{{searchParams.categoryName}}<i @click="removeCategoryName">×</i></li>
+            <li class="with-x" v-if="searchParams.keyword">{{searchParams.keyword}}<i @click="removeKeyword">×</i></li>
+            <li class="with-x" v-for="(prop ,index) in searchParams.props" :key="index">{{prop.split(":")[1]}}<i @click="removeProps(index)">×</i></li>
           </ul>
         </div>
 
         <!--selector-->
-        <SearchSelector />
+        <SearchSelector @getClickTradeMark="getTrademarkInfo" @getAttrInfo="getAttrInfo"/>
 
         <!--details-->
         <div class="details clearfix">
@@ -132,19 +131,23 @@ export default {
   data() {
     return {
       searchParams: {
-        categary1Id:"",
-        categary2Id:"",
-        categary3Id:"",
-        categaryName:"",
+        category1Id:"",
+        category2Id:"",
+        category3Id:"",
+        categoryName:"",
         keyword:"",
         order:"",
         pageNo:1,
-        pageSize:10,
+        pageSize:3,
         props:[],
         // 品牌
         trademark:"",
       }
     }
+  },
+  beforeMount() {
+    // 合并请求参数
+    Object.assign(this.searchParams,this.$route.params,this.$route.query)
   },
   components: {
     SearchSelector,
@@ -152,12 +155,62 @@ export default {
   mounted() {
     this.getData()
   },
+  watch: {
+    // 监听路由变化重新发送请求
+    $route() {
+      Object.assign(this.searchParams,this.$route.params,this.$route.query)
+      this.getData()
+      this.searchParams.category1Id =undefined
+      this.searchParams.category2Id =undefined
+      this.searchParams.category3Id =undefined
+    },
+  },
   computed: {
     ...mapGetters(['goodsList'])
   },
   methods:{
     getData(){
       this.$store.dispatch("getSearchInfo",this.searchParams);
+    },
+    removeCategoryName() {
+      this.searchParams.categoryName = undefined
+      this.searchParams.category1Id =undefined
+      this.searchParams.category2Id =undefined
+      this.searchParams.category3Id =undefined
+      this.getData()
+      // 路由地址修改
+      if (this.$route.params) {
+        this.$router.push({name:"search",params:this.$route.params})
+      }
+    },
+    removeKeyword() {
+      this.searchParams.keyword =undefined
+      this.getData()
+      this.$bus.$emit("clearKeyword")
+      // 路由地址修改
+      if (this.$route.query) {
+        this.$router.push({name:"search",query:this.$route.query})
+      }
+    },
+    removeTrademark() {
+      this.searchParams.trademark = undefined
+      this.getData()
+    },
+    removeProps(index) {
+      this.searchParams.props.splice(index,1)
+      this.getData()
+    },
+    getTrademarkInfo(trademark) {
+      this.searchParams.trademark = `${trademark.tmId}:${trademark.tmName}`
+      this.getData()
+    },
+    getAttrInfo(attr,attrValue) {
+      console.log(attr,attrValue)
+      let props = `${attr.attrId}:${attrValue}:${attr.attrName}`
+      if (this.searchParams.props.indexOf(props)== -1)  {
+        this.searchParams.props.push(props)
+      }
+      this.getData()
     }
   }
 };
