@@ -26,10 +26,10 @@ const getters ={
         return state.searchList.goodsList || []
     },
     trademarkList() {
-        return state.searchList.trademarkList
+        return state.searchList.trademarkList ||[]
     },
     attrsList() {
-        return state.searchList.attrsList
+        return state.searchList.attrsList || []
     }
 }
 

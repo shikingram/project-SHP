@@ -7,12 +7,13 @@ import mockRequest from './mockAjax'
 // 三级联动接口
 // api/product/getBaseCategoryList 
 
-export const reqCategoryList= ()=> requests ({url:'/product/getBaseCategoryList',method:'get'})
-export const reqGetBannerList = ()=> mockRequest.get('/banner')
-export const reqGetFloorList = ()=> mockRequest.get('/floor')
+export const reqCategoryList = () => requests({ url: '/product/getBaseCategoryList', method: 'get' })
+export const reqGetBannerList = () => mockRequest.get('/banner')
+export const reqGetFloorList = () => mockRequest.get('/floor')
 // export const reqGetBannerListBack= function(){
 //    return axios.get('/mock/banner')
 // }
 
-export const reqGetSearchInfo= (params)=> requests({url:'/list',method:'post',data:params})
+export const reqGetSearchInfo = (params) => requests({ url: '/list', method: 'post', data: params })
 
+export const reqGetGoodInfo = (goodId) => requests({ url: `/item/${goodId}`, method: 'get' })
