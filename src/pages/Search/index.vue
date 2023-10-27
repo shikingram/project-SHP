@@ -11,25 +11,59 @@
             </li>
           </ul>
           <ul class="fl sui-tag">
-            <li class="with-x" v-if="searchParams.categoryName">{{searchParams.categoryName}}<i @click="removeCategoryName">×</i></li>
-            <li class="with-x" v-if="searchParams.keyword">{{searchParams.keyword}}<i @click="removeKeyword">×</i></li>
-            <li class="with-x" v-for="(prop ,index) in searchParams.props" :key="index">{{prop.split(":")[1]}}<i @click="removeProps(index)">×</i></li>
+            <li class="with-x" v-if="searchParams.categoryName">
+              {{ searchParams.categoryName
+              }}<i @click="removeCategoryName">×</i>
+            </li>
+            <li class="with-x" v-if="searchParams.keyword">
+              {{ searchParams.keyword }}<i @click="removeKeyword">×</i>
+            </li>
+            <li
+              class="with-x"
+              v-for="(prop, index) in searchParams.props"
+              :key="index"
+            >
+              {{ prop.split(":")[1] }}<i @click="removeProps(index)">×</i>
+            </li>
           </ul>
         </div>
 
         <!--selector-->
-        <SearchSelector @getClickTradeMark="getTrademarkInfo" @getAttrInfo="getAttrInfo"/>
+        <SearchSelector
+          @getClickTradeMark="getTrademarkInfo"
+          @getAttrInfo="getAttrInfo"
+        />
 
         <!--details-->
         <div class="details clearfix">
           <div class="sui-navbar">
             <div class="navbar-inner filter">
               <ul class="sui-nav">
-                <li :class="{active: checkClass('1')}" @click="chageOrder('1')">
-                  <a href="#">综合 <span v-show="checkClass('1')" class="iconfont" :class="{ 'icon-shang': isAsc, 'icon-xia': isDesc }"></span></a>
+                <li
+                  :class="{ active: checkClass('1') }"
+                  @click="chageOrder('1')"
+                >
+                  <a href="#"
+                    >综合
+                    <span
+                      v-show="checkClass('1')"
+                      class="iconfont"
+                      :class="{ 'icon-shang': isAsc, 'icon-xia': isDesc }"
+                    ></span
+                  ></a>
                 </li>
-                <li :class="{active: checkClass('2')}" @click="chageOrder('2')">
-                  <a href="#">价格 <span v-show="checkClass('2')" class="iconfont" :class="{ 'icon-shang': isAsc, 'icon-xia': isDesc }"></span></a>
+                <li
+                  :class="{ active: checkClass('2') }"
+                  @click="chageOrder('2')"
+                >
+                  <a href="#"
+                    >价格
+                    <span
+                      v-show="checkClass('2')"
+                      class="iconfont"
+                      :class="{ 'icon-shang': isAsc, 'icon-xia': isDesc }"
+                    ></span
+                  ></a>
                 </li>
               </ul>
             </div>
@@ -46,7 +80,7 @@
                   <div class="price">
                     <strong>
                       <em>¥ </em>
-                      <i>{{good.price}}</i>
+                      <i>{{ good.price }}</i>
                     </strong>
                   </div>
                   <div class="attr">
@@ -54,7 +88,7 @@
                       target="_blank"
                       href="item.html"
                       title="促销信息，下单即赠送三个月CIBN视频会员卡！【小米电视新品4A 58 火爆预约中】"
-                      >{{good.title}}</a
+                      >{{ good.title }}</a
                     >
                   </div>
                   <div class="commit">
@@ -73,11 +107,16 @@
                   </div>
                 </div>
               </li>
-
             </ul>
           </div>
           <!-- 分页器组件 -->
-        <Pagination></Pagination>
+          <Pagination
+            :pageNo="searchParams.pageNo"
+            :pageSize="searchParams.pageSize"
+            :total="total"
+            :continues="5"
+            @getPageNo="getPageNo"
+          ></Pagination>
         </div>
       </div>
     </div>
@@ -85,49 +124,52 @@
 </template>
 
 <script>
-import { mapGetters } from "vuex";
+import { mapGetters, mapState } from "vuex";
 import SearchSelector from "./SearchSelector/SearchSelector";
 export default {
   name: "Search",
   data() {
     return {
       searchParams: {
-        category1Id:"",
-        category2Id:"",
-        category3Id:"",
-        categoryName:"",
-        keyword:"",
-        order:"1:desc",
-        pageNo:1,
-        pageSize:3,
-        props:[],
+        category1Id: "",
+        category2Id: "",
+        category3Id: "",
+        categoryName: "",
+        keyword: "",
+        order: "1:desc",
+        pageNo: 1,
+        pageSize: 5,
+        props: [],
         // 品牌
-        trademark:"",
-      }
-    }
+        trademark: "",
+      },
+    };
   },
   beforeMount() {
     // 合并请求参数
-    Object.assign(this.searchParams,this.$route.params,this.$route.query)
+    Object.assign(this.searchParams, this.$route.params, this.$route.query);
   },
   components: {
     SearchSelector,
   },
   mounted() {
-    this.getData()
+    this.getData();
   },
   watch: {
     // 监听路由变化重新发送请求
     $route() {
-      Object.assign(this.searchParams,this.$route.params,this.$route.query)
-      this.getData()
-      this.searchParams.category1Id =undefined
-      this.searchParams.category2Id =undefined
-      this.searchParams.category3Id =undefined
+      Object.assign(this.searchParams, this.$route.params, this.$route.query);
+      this.getData();
+      this.searchParams.category1Id = undefined;
+      this.searchParams.category2Id = undefined;
+      this.searchParams.category3Id = undefined;
     },
   },
   computed: {
-    ...mapGetters(['goodsList']),
+    ...mapGetters(["goodsList"]),
+    ...mapState({
+      total: (state) => state.search.searchList.total,
+    }),
     isAsc() {
       return this.searchParams.order.indexOf("asc") != -1;
     },
@@ -135,54 +177,54 @@ export default {
       return this.searchParams.order.indexOf("desc") != -1;
     },
   },
-  methods:{
-    getData(){
-      this.$store.dispatch("getSearchInfo",this.searchParams);
+  methods: {
+    getData() {
+      this.$store.dispatch("getSearchInfo", this.searchParams);
     },
     removeCategoryName() {
-      this.searchParams.categoryName = undefined
-      this.searchParams.category1Id =undefined
-      this.searchParams.category2Id =undefined
-      this.searchParams.category3Id =undefined
-      this.getData()
+      this.searchParams.categoryName = undefined;
+      this.searchParams.category1Id = undefined;
+      this.searchParams.category2Id = undefined;
+      this.searchParams.category3Id = undefined;
+      this.getData();
       // 路由地址修改
       if (this.$route.params) {
-        this.$router.push({name:"search",params:this.$route.params})
+        this.$router.push({ name: "search", params: this.$route.params });
       }
     },
     removeKeyword() {
-      this.searchParams.keyword =undefined
-      this.getData()
-      this.$bus.$emit("clearKeyword")
+      this.searchParams.keyword = undefined;
+      this.getData();
+      this.$bus.$emit("clearKeyword");
       // 路由地址修改
       if (this.$route.query) {
-        this.$router.push({name:"search",query:this.$route.query})
+        this.$router.push({ name: "search", query: this.$route.query });
       }
     },
     removeTrademark() {
-      this.searchParams.trademark = undefined
-      this.getData()
+      this.searchParams.trademark = undefined;
+      this.getData();
     },
     removeProps(index) {
-      this.searchParams.props.splice(index,1)
-      this.getData()
+      this.searchParams.props.splice(index, 1);
+      this.getData();
     },
     getTrademarkInfo(trademark) {
-      this.searchParams.trademark = `${trademark.tmId}:${trademark.tmName}`
-      this.getData()
+      this.searchParams.trademark = `${trademark.tmId}:${trademark.tmName}`;
+      this.getData();
     },
-    getAttrInfo(attr,attrValue) {
-      console.log(attr,attrValue)
-      let props = `${attr.attrId}:${attrValue}:${attr.attrName}`
-      if (this.searchParams.props.indexOf(props)== -1)  {
-        this.searchParams.props.push(props)
+    getAttrInfo(attr, attrValue) {
+      console.log(attr, attrValue);
+      let props = `${attr.attrId}:${attrValue}:${attr.attrName}`;
+      if (this.searchParams.props.indexOf(props) == -1) {
+        this.searchParams.props.push(props);
       }
-      this.getData()
+      this.getData();
     },
-    checkClass(target){
-      return this.searchParams.order.indexOf(target)!= -1
+    checkClass(target) {
+      return this.searchParams.order.indexOf(target) != -1;
     },
-    chageOrder(flag){
+    chageOrder(flag) {
       // 1 综合 2 价格
       let originOrder = this.searchParams.order;
       let orginsFlag = originOrder.split(":")[0];
@@ -198,9 +240,13 @@ export default {
       }
       //需要给order重新赋值
       this.searchParams.order = newOrder;
-      this.getData()
-    }
-  }
+      this.getData();
+    },
+    getPageNo(pageNo) {
+      this.searchParams.pageNo = pageNo;
+      this.getData();
+    },
+  },
 };
 </script>
 
